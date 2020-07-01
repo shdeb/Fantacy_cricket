@@ -127,7 +127,12 @@ class MainControl(QtWidgets.QMainWindow):
         n=self.mainUi.result_list.count()
         if not n>0: return
         teamsSave=[]
-        teamName=self.NEWTeamDialog.teamNameTxt
+        teamName=self.mainUi.teamNameVal.text()
+        dbCur.execute("select distinct name from teams")
+        if (teamName,) in dbCur.fetchall():
+            QtWidgets.QMessageBox.warning(self, "DB warning", "Team with name '"+teamName+"' already exists in DataBase !\nCreate team with differnt name.")
+            return
+
         for i in range(n):
             curPlayer=self.mainUi.result_list.item(i).text()[4:]
             dbCur.execute("insert into teams(name,players,value) values(?, ?, ?)",(teamName,curPlayer,self.players[curPlayer][2]))
@@ -340,8 +345,6 @@ class MainControl(QtWidgets.QMainWindow):
         self.players["__WK_lock__"]=False
 
 
-
-
         
 class newTeamControl(QtWidgets.QDialog):
     def __init__(self, parent = None):
@@ -445,11 +448,6 @@ class evalControl(QtWidgets.QDialog):
         plyrPoint+=((scored//2)+(scored//50)*5+(scored//100)*10+wkts*10+(wkts//3)*5+(wkts//5)*10+catches*10+stumping*10+RO*10)
 
         return plyrPoint
-
-
-
-
-
 
 
 
